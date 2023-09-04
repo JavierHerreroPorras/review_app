@@ -1,0 +1,21 @@
+{
+  "name": "review_app",
+  "version": "1.0.0",
+  "description": "An app for creating reviews of films and series, while practicing Node.js and Express.",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "NODE_ENV=test mocha --recursive tests",
+    "start": "node src/app.js"
+  },
+  "author": "Javier Herrero Porras",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sequelize": "^6.32.1",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "chai": "^4.3.8",
+    "mocha": "^10.2.0"
+  }
+}
