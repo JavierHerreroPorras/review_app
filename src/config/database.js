@@ -9,7 +9,8 @@ if (process.env.NODE_ENV === 'test'){
 // Define database connection
 const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: database
-})
+    storage: database,
+    logging: false
+});
 
 module.exports = sequelize;
