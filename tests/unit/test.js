@@ -1,6 +1,14 @@
 var assert = require('assert');
 const sequelize = require('../../src/config/database.js');
 const Review = require('../../src/models/review.js');
+const { createReview, getAllReviews } = require('../../src/controllers/review.js');
+
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const { expect } = chai;
+const sinon = require('sinon');
+
+chai.use(chaiHttp);
 
 describe('Review model', function (){
   
@@ -60,3 +68,52 @@ describe('Review model', function (){
   });
 
 });
+
+describe('Review controllers', function () {
+  describe('createReview', function () {
+    it('should create a new review', async function () {
+      // Create a fake request and a fake response
+      const req = {
+        body: {
+          title: 'A test movie',
+          type: 'movie',
+          ranking: 8,
+          opinion: 'A test opinion',
+          watched_at: '2019-5-23'
+        }
+      }
+      const res = {
+        json: sinon.spy()
+      }
+
+      await createReview(req, res);
+
+      // Check response review properties
+      expect(res.json.calledOnce).to.be.true;
+      expect(res.json.firstCall.args[0]).to.be.an('object');
+      expect(res.json.firstCall.args[0]).to.have.a.property('title').equal('A test movie');
+    });
+  });
+
+  describe('getAllReviews', function () {
+    it('should get all reviews', async function () {
+      // Create a fake request and a fake response
+      const req = {}
+      const res = {
+        json: sinon.spy()
+      }
+
+      // Mock Review.findAll() method
+      var stub = sinon.stub(Review, 'findAll');
+      stub.returns(['Review 1', 'Review 2']);
+
+      await getAllReviews(req, res);
+
+      // Check response array properties
+      expect(res.json.calledOnce).to.be.true;
+      expect(res.json.firstCall.args[0]).to.be.an('array');
+      expect(res.json.firstCall.args[0]).to.have.lengthOf(2);
+    });
+  });
+});
+
