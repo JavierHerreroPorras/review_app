@@ -22,6 +22,21 @@ describe('Reviews API', function () {
     expect(res.body).to.have.lengthOf(2);
   });
 
+  it('should get one review by its id', async function () {
+    const review = await Review.createInstance('Review 1', 'movie', 8, 'Good movie', new Date());
+    await Review.createInstance('Review 2', 'anime', 7, 'Interesting anime', new Date());
+
+    const res = await chai.request(app).get(`/reviews/${review.id}`);
+
+    expect(res).to.have.status(200);
+    expect(res.body).to.be.an('object');
+    expect(res.body).to.have.property('title').equal(review.title);
+    expect(res.body).to.have.property('type').equal(review.type);
+    expect(res.body).to.have.property('rating').equal(review.rating);
+    expect(res.body).to.have.property('opinion').equal(review.opinion);
+    expect(res.body).to.have.property('id').equal(review.id);
+  });
+
   it('should create a new review', async function () {
     const newReview = {
       title: 'New Review',

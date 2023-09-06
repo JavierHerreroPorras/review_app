@@ -1,7 +1,7 @@
 var assert = require('assert');
 const sequelize = require('../../src/config/database.js');
 const Review = require('../../src/models/review.js');
-const { createReview, getAllReviews } = require('../../src/controllers/review.js');
+const { createReview, getAllReviews, getReview } = require('../../src/controllers/review.js');
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -113,6 +113,39 @@ describe('Review controllers', function () {
       expect(res.json.calledOnce).to.be.true;
       expect(res.json.firstCall.args[0]).to.be.an('array');
       expect(res.json.firstCall.args[0]).to.have.lengthOf(2);
+
+      stub.restore();
+    });
+  });
+
+  describe('getReview', function () {
+    it('should get a review by its id', async function () {
+      // Create a fake request and a fake response
+      const req = {
+        params: {
+          id: 3
+        }
+      }
+      const res = {
+        json: sinon.spy()
+      }
+
+      // Mock Review.findByPk() method
+      var stub = sinon.stub(Review, 'findByPk')
+      stub.returns('Review_3');
+
+      await getReview(req, res);
+
+      // Check response
+      expect(res.json.calledOnce).to.be.true;
+      expect(res.json.firstCall).to.be.an('object');
+      expect(res.json.firstCall.args[0]).to.deep.equal('Review_3');
+
+      // Check if stub has been called with correct arguments
+      expect(stub.calledOnce).to.be.true;
+      expect(stub.calledWith(3)).to.be.true;
+
+      stub.restore();
     });
   });
 });

@@ -11,4 +11,9 @@ async function getAllReviews(req, res){
     return res.json(reviews);
 }
 
-module.exports = { createReview, getAllReviews };
+async function getReview(req, res){
+    const id = req.params.id;
+    return res.json(await Review.findByPk(Number(id)));
+}
+
+module.exports = { createReview, getAllReviews, getReview };
