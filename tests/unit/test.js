@@ -118,10 +118,10 @@ describe('Review controllers', function () {
       stub.restore();
     });
 
-    it('should search for records by name', async function () {
+    it('should search for records by title', async function () {
       const req = {
           query: {
-              name: 'ExampleName'
+              title: 'ExampleName'
           },
       };
       const res = {
@@ -140,7 +140,79 @@ describe('Review controllers', function () {
       expect(res.json.firstCall.args[0]).to.deep.equal([{ id: 1, title: 'ExampleName' }]);
 
       findAllStub.restore();
-  });
+    });
+
+    it('should search for records by title', async function () {
+      const req = {
+          query: {
+              title: 'ExampleName'
+          },
+      };
+      const res = {
+          json: sinon.spy()
+      };
+
+      const findAllStub = sinon.stub(Review, 'findAll');
+      findAllStub.returns([{ id: 1, title: 'ExampleName' }]);
+
+      await getAllReviews(req, res);
+
+      expect(findAllStub.calledOnce).to.be.true;
+      expect(findAllStub.firstCall.args[0].where.title[Op.substring]).to.equal('ExampleName');
+
+      expect(res.json.calledOnce).to.be.true;
+      expect(res.json.firstCall.args[0]).to.deep.equal([{ id: 1, title: 'ExampleName' }]);
+
+      findAllStub.restore();
+    });
+
+    it('should search for records by type', async function () {
+      const req = {
+          query: {
+              type: 'movie'
+          },
+      };
+      const res = {
+          json: sinon.spy()
+      };
+
+      const findAllStub = sinon.stub(Review, 'findAll');
+      findAllStub.returns([{ id: 1, title: 'Movie 1' }, { id: 2, title: 'Movie 2' }]);
+
+      await getAllReviews(req, res);
+
+      expect(findAllStub.calledOnce).to.be.true;
+      expect(findAllStub.firstCall.args[0].where.type).to.equal('movie');
+
+      expect(res.json.calledOnce).to.be.true;
+      expect(res.json.firstCall.args[0]).to.deep.equal([{ id: 1, title: 'Movie 1' }, { id: 2, title: 'Movie 2' }]);
+
+      findAllStub.restore();
+    });
+
+    it('should search for records by rating', async function () {
+      const req = {
+          query: {
+              rating: 5
+          },
+      };
+      const res = {
+          json: sinon.spy()
+      };
+
+      const findAllStub = sinon.stub(Review, 'findAll');
+      findAllStub.returns([{ id: 1, title: 'Movie 1' }, { id: 2, title: 'Movie 2' }]);
+
+      await getAllReviews(req, res);
+
+      expect(findAllStub.calledOnce).to.be.true;
+      expect(findAllStub.firstCall.args[0].where.rating[Op.gte]).to.equal(5);
+
+      expect(res.json.calledOnce).to.be.true;
+      expect(res.json.firstCall.args[0]).to.deep.equal([{ id: 1, title: 'Movie 1' }, { id: 2, title: 'Movie 2' }]);
+
+      findAllStub.restore();
+    });
   });
 
   describe('getReview', function () {

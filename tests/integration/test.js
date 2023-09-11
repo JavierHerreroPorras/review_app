@@ -22,18 +22,74 @@ describe('Reviews API', function () {
     expect(res.body).to.have.lengthOf(2);
   });
 
-  it('should filter all reviews by name', async function () {
+  it('should filter all reviews by title', async function () {
     await Review.createInstance('Review 1', 'movie', 8, 'Good movie', new Date());
     await Review.createInstance('Review 2', 'anime', 7, 'Interesting anime', new Date());
     await Review.createInstance('Review 2.2', 'anime', 7, 'Interesting anime', new Date());
 
-    const res = await chai.request(app).get('/reviews?name=Review 2');
+    const res = await chai.request(app).get('/reviews?title=Review 2');
 
     expect(res).to.have.status(200);
     expect(res.body).to.be.an('array');
     expect(res.body).to.have.lengthOf(2);
-    expect(res.body[0]).to.have.property('title').deep.equal('Review 2')
-    expect(res.body[1]).to.have.property('title').deep.equal('Review 2.2')
+    expect(res.body[0]).to.have.property('title').deep.equal('Review 2');
+    expect(res.body[1]).to.have.property('title').deep.equal('Review 2.2');
+  });
+
+  it('should filter all reviews by type', async function () {
+    await Review.createInstance('Review 1', 'movie', 8, 'Good movie', new Date());
+    await Review.createInstance('Review 2', 'anime', 7, 'Interesting anime', new Date());
+    await Review.createInstance('Review 2.2', 'anime', 7, 'Interesting anime', new Date());
+
+    const res = await chai.request(app).get('/reviews?type=movie');
+
+    expect(res).to.have.status(200);
+    expect(res.body).to.be.an('array');
+    expect(res.body).to.have.lengthOf(1);
+    expect(res.body[0]).to.have.property('title').deep.equal('Review 1');
+    expect(res.body[0]).to.have.property('type').deep.equal('movie');
+  });
+
+  it('should filter all reviews by rating', async function () {
+    await Review.createInstance('Review 1', 'movie', 8, 'Good movie', new Date());
+    await Review.createInstance('Review 2', 'anime', 7, 'Interesting anime', new Date());
+    await Review.createInstance('Review 2.2', 'anime', 4, 'Interesting anime', new Date());
+
+    const res = await chai.request(app).get('/reviews?rating=5');
+
+    expect(res).to.have.status(200);
+    expect(res.body).to.be.an('array');
+    expect(res.body).to.have.lengthOf(2);
+    expect(res.body[0]).to.have.property('title').deep.equal('Review 1');
+    expect(res.body[1]).to.have.property('title').deep.equal('Review 2');
+  });
+
+  it('should filter all reviews by rating', async function () {
+    await Review.createInstance('Review 1', 'movie', 8, 'Good movie', new Date());
+    await Review.createInstance('Review 2', 'anime', 7, 'Interesting anime', new Date());
+    await Review.createInstance('Review 2.2', 'anime', 4, 'Interesting anime', new Date());
+
+    const res = await chai.request(app).get('/reviews?rating=5');
+
+    expect(res).to.have.status(200);
+    expect(res.body).to.be.an('array');
+    expect(res.body).to.have.lengthOf(2);
+    expect(res.body[0]).to.have.property('title').deep.equal('Review 1');
+    expect(res.body[1]).to.have.property('title').deep.equal('Review 2');
+  });
+
+  it('should return a 500 error when filtering', async function () {
+    await Review.createInstance('Review 1', 'movie', 8, 'Good movie', new Date());
+    await Review.createInstance('Review 2', 'anime', 7, 'Interesting anime', new Date());
+    await Review.createInstance('Review 2.2', 'anime', 4, 'Interesting anime', new Date());
+
+    const res = await chai.request(app).get('/reviews?rating=5');
+
+    expect(res).to.have.status(200);
+    expect(res.body).to.be.an('array');
+    expect(res.body).to.have.lengthOf(2);
+    expect(res.body[0]).to.have.property('title').deep.equal('Review 1');
+    expect(res.body[1]).to.have.property('title').deep.equal('Review 2');
   });
 
   it('should get one review by its id', async function () {
@@ -50,8 +106,6 @@ describe('Reviews API', function () {
     expect(res.body).to.have.property('opinion').equal(review.opinion);
     expect(res.body).to.have.property('id').equal(review.id);
   });
-
-  
 
   it('should create a new review', async function () {
     const newReview = {

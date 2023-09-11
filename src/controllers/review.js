@@ -8,29 +8,24 @@ async function createReview(req, res){
 }
 
 async function getAllReviews(req, res){
-    var name = '';
-    if (req.query){
-        name = req.query.name;
+    const { title, type, rating } = req.query || {};
+    var query = {};
+    if (title) {
+        query.title = {[Op.substring]: title};
+    } else if (type) {
+        query.type = type;
+    } else if (rating) {
+        query.rating = {[Op.gte]: rating};
     }
-    var reviews = {};
+
     try {
-        if (name){
-            reviews = await Review.findAll({
-                where: {
-                    title: {
-                        [Op.substring]: name,
-                    }
-                }
-            })
-        }
-        else {
-            reviews = await Review.findAll();
-        }
+        const reviews = await Review.findAll({ where: query});
+        return res.json(reviews);
     }
     catch (error) {
-        console.log(error)
+        console.log(error);
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
-    return res.json(reviews);
 }
 
 async function getReview(req, res){
