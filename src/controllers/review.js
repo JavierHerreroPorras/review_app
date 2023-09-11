@@ -1,4 +1,5 @@
 const Review = require('../models/review');
+const { Op } = require("sequelize");
 
 async function createReview(req, res){
     const { title, type, rating, opinion, watched_at } = req.body;
@@ -7,7 +8,28 @@ async function createReview(req, res){
 }
 
 async function getAllReviews(req, res){
-    const reviews = await Review.findAll();
+    var name = '';
+    if (req.query){
+        name = req.query.name;
+    }
+    var reviews = {};
+    try {
+        if (name){
+            reviews = await Review.findAll({
+                where: {
+                    title: {
+                        [Op.substring]: name,
+                    }
+                }
+            })
+        }
+        else {
+            reviews = await Review.findAll();
+        }
+    }
+    catch (error) {
+        console.log(error)
+    }
     return res.json(reviews);
 }
 

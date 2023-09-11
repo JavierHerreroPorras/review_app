@@ -1,5 +1,6 @@
 var assert = require('assert');
 const sequelize = require('../../src/config/database.js');
+const { Op } = require("sequelize");
 const Review = require('../../src/models/review.js');
 const { createReview, getAllReviews, getReview } = require('../../src/controllers/review.js');
 
@@ -116,6 +117,30 @@ describe('Review controllers', function () {
 
       stub.restore();
     });
+
+    it('should search for records by name', async function () {
+      const req = {
+          query: {
+              name: 'ExampleName'
+          },
+      };
+      const res = {
+          json: sinon.spy()
+      };
+
+      const findAllStub = sinon.stub(Review, 'findAll');
+      findAllStub.returns([{ id: 1, title: 'ExampleName' }]);
+
+      await getAllReviews(req, res);
+
+      expect(findAllStub.calledOnce).to.be.true;
+      expect(findAllStub.firstCall.args[0].where.title[Op.substring]).to.equal('ExampleName');
+
+      expect(res.json.calledOnce).to.be.true;
+      expect(res.json.firstCall.args[0]).to.deep.equal([{ id: 1, title: 'ExampleName' }]);
+
+      findAllStub.restore();
+  });
   });
 
   describe('getReview', function () {
