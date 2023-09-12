@@ -12,9 +12,11 @@ async function getAllReviews(req, res){
     var query = {};
     if (title) {
         query.title = {[Op.substring]: title};
-    } else if (type) {
+    }
+    if (type) {
         query.type = type;
-    } else if (rating) {
+    }
+    if (rating) {
         query.rating = {[Op.gte]: rating};
     }
 

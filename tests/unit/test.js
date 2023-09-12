@@ -213,6 +213,27 @@ describe('Review controllers', function () {
 
       findAllStub.restore();
     });
+
+    it('should filter by type and rating', async function() {
+      const req = {
+        query: {
+          rating: 5,
+          type: 'anime'
+        }
+      }
+      const res = {
+        json: sinon.spy()
+      }
+
+      const findAllStub = sinon.stub(Review, 'findAll');
+      findAllStub.returns([{ id: 1, title: 'Anime 1' }, { id: 2, title: 'Anime 2' }]);
+
+      await getAllReviews(req, res);
+
+      expect(findAllStub.calledOnce).to.be.true;
+      expect(findAllStub.firstCall.args[0].where.rating[Op.gte]).to.equal(5);
+      expect(findAllStub.firstCall.args[0].where.type).to.equal('anime');
+    })
   });
 
   describe('getReview', function () {

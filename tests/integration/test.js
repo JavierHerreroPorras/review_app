@@ -78,19 +78,38 @@ describe('Reviews API', function () {
     expect(res.body[1]).to.have.property('title').deep.equal('Review 2');
   });
 
+  it('should filter all reviews by multiple attributes: rating and type', async function () {
+    await Review.createInstance('Review 1', 'movie', 8, 'Good movie', new Date());
+    await Review.createInstance('Review 2', 'anime', 7, 'Interesting anime', new Date());
+    await Review.createInstance('Review 2.2', 'anime', 4, 'Interesting anime', new Date());
+
+    const res = await chai.request(app).get('/reviews?rating=5&type=anime');
+
+    expect(res).to.have.status(200);
+    expect(res.body).to.be.an('array');
+    expect(res.body).to.have.lengthOf(1);
+    expect(res.body[0]).to.have.property('title').deep.equal('Review 2');
+    expect(res.body[0]).to.have.property('rating').deep.equal(7);
+  });
+
   it('should return a 500 error when filtering', async function () {
     await Review.createInstance('Review 1', 'movie', 8, 'Good movie', new Date());
     await Review.createInstance('Review 2', 'anime', 7, 'Interesting anime', new Date());
     await Review.createInstance('Review 2.2', 'anime', 4, 'Interesting anime', new Date());
 
+    const originalFindAll = Review.findAll;
+    Review.findAll = function () {
+        throw new Error('Error for test');
+    }
+
     const res = await chai.request(app).get('/reviews?rating=5');
 
-    expect(res).to.have.status(200);
-    expect(res.body).to.be.an('array');
-    expect(res.body).to.have.lengthOf(2);
-    expect(res.body[0]).to.have.property('title').deep.equal('Review 1');
-    expect(res.body[1]).to.have.property('title').deep.equal('Review 2');
+    expect(res).to.have.status(500);
+    expect(res.body).to.deep.equal({ error: 'Internal Server Error' });
+
+    Review.findAll = originalFindAll;
   });
+
 
   it('should get one review by its id', async function () {
     const review = await Review.createInstance('Review 1', 'movie', 8, 'Good movie', new Date());
