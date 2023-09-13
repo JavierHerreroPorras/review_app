@@ -2,9 +2,69 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const Review = require('../../src/models/review.js');
 const app = require('../../src/app.js');
+const sinon = require('sinon');
+const axios = require('axios');
 
 const { expect } = chai;
 chai.use(chaiHttp);
+
+function getMovieData(){
+  return {
+    data: {
+      "Title": "Breaking Bad",
+      "Year": "2008-2013",
+      "Rated": "TV-MA",
+      "Released": "20 Jan 2008",
+      "Runtime": "49 min",
+      "Genre": "Crime, Drama, Thriller",
+      "Director": "N/A",
+      "Writer": "Vince Gilligan",
+      "Actors": "Bryan Cranston, Aaron Paul, Anna Gunn",
+      "Plot": "A chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing and selling methamphetamine with a former student in order to secure his family's future.",
+      "Language": "English, Spanish",
+      "Country": "United States",
+      "Awards": "Won 16 Primetime Emmys. 155 wins & 247 nominations total",
+      "Poster": "https://m.media-amazon.com/images/M/MV5BYmQ4YWMxYjUtNjZmYi00MDQ1LWFjMjMtNjA5ZDdiYjdiODU5XkEyXkFqcGdeQXVyMTMzNDExODE5._V1_SX300.jpg",
+      "Metascore": "N/A",
+      "imdbID": "tt0903747",
+      "Type": "series",
+      "totalSeasons": "5",
+      "Response": "True"
+    }
+  }
+}
+
+function getMovies(){
+  return {
+    data: {
+        "Search": [
+            {
+                "Title": "Breaking Bad",
+                "Year": "2008-2013",
+                "imdbID": "tt0903747",
+                "Type": "series",
+                "Poster": "https://m.media-amazon.com/images/M/MV5BYmQ4YWMxYjUtNjZmYi00MDQ1LWFjMjMtNjA5ZDdiYjdiODU5XkEyXkFqcGdeQXVyMTMzNDExODE5._V1_SX300.jpg"
+            },
+            {
+                "Title": "El Camino: A Breaking Bad Movie",
+                "Year": "2019",
+                "imdbID": "tt9243946",
+                "Type": "movie",
+                "Poster": "https://m.media-amazon.com/images/M/MV5BNjk4MzVlM2UtZGM0ZC00M2M1LThkMWEtZjUyN2U2ZTc0NmM5XkEyXkFqcGdeQXVyOTAzMTc2MjA@._V1_SX300.jpg"
+            },
+            {
+                "Title": "The Road to El Camino: Behind the Scenes of El Camino: A Breaking Bad Movie",
+                "Year": "2019",
+                "imdbID": "tt11151792",
+                "Type": "movie",
+                "Poster": "https://m.media-amazon.com/images/M/MV5BNDEwNTgyM2MtYzA0ZS00ODU0LWFlMmEtN2NkYzNlNjRhNzJmXkEyXkFqcGdeQXVyMTExNzkxOTY@._V1_SX300.jpg"
+            }
+        ],
+        "totalResults": "3",
+        "Response": "True"
+    }
+  }
+}
 
 describe('Reviews API', function () {
   beforeEach(async () => {
@@ -144,4 +204,35 @@ describe('Reviews API', function () {
     expect(res.body).to.have.property('rating').equal(9);
     expect(res.body).to.have.property('opinion').equal('Excellent movie');
   });
+});
+
+describe('Movies API', function() {
+  it('should search movies by its title, returning coincidences', async function() {
+    // Make a sinon.stub to axios call
+    var stub = sinon.stub(axios, 'get');
+    stub.returns(getMovies());
+
+    const res = await chai.request(app).get('/movies?title=Breaking Bad');
+
+    expect(res).to.have.status(200);
+    expect(res.body).to.be.an('array');
+    expect(res.body).to.have.lengthOf(3);
+
+    stub.restore();
+  });
+
+  it('should get movie details by its external id', async function() {
+    // Make a sinon.stub to axios call
+    var stub = sinon.stub(axios, 'get');
+    stub.returns(getMovieData());
+    
+    const res = await chai.request(app).get('/movies/tt0903747/');
+
+    expect(res).to.have.status(200);
+    expect(res.body).to.be.an('object');
+    expect(res.body).to.have.a.property('Title').equal('Breaking Bad');
+
+    stub.restore();
+  });
+
 });

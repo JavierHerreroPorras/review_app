@@ -3,13 +3,73 @@ const sequelize = require('../../src/config/database.js');
 const { Op } = require("sequelize");
 const Review = require('../../src/models/review.js');
 const { createReview, getAllReviews, getReview } = require('../../src/controllers/review.js');
+const { searchMovie, getMovie } = require('../../src/controllers/movie.js');
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const { expect } = chai;
 const sinon = require('sinon');
+const axios = require('axios');
 
 chai.use(chaiHttp);
+
+function getMovieData(){
+  return {
+    data: {
+      "Title": "Breaking Bad",
+      "Year": "2008-2013",
+      "Rated": "TV-MA",
+      "Released": "20 Jan 2008",
+      "Runtime": "49 min",
+      "Genre": "Crime, Drama, Thriller",
+      "Director": "N/A",
+      "Writer": "Vince Gilligan",
+      "Actors": "Bryan Cranston, Aaron Paul, Anna Gunn",
+      "Plot": "A chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing and selling methamphetamine with a former student in order to secure his family's future.",
+      "Language": "English, Spanish",
+      "Country": "United States",
+      "Awards": "Won 16 Primetime Emmys. 155 wins & 247 nominations total",
+      "Poster": "https://m.media-amazon.com/images/M/MV5BYmQ4YWMxYjUtNjZmYi00MDQ1LWFjMjMtNjA5ZDdiYjdiODU5XkEyXkFqcGdeQXVyMTMzNDExODE5._V1_SX300.jpg",
+      "Metascore": "N/A",
+      "imdbID": "tt0903747",
+      "Type": "series",
+      "totalSeasons": "5",
+      "Response": "True"
+    }
+  }
+}
+
+function getMovies(){
+  return {
+    data: {
+        "Search": [
+            {
+                "Title": "Breaking Bad",
+                "Year": "2008-2013",
+                "imdbID": "tt0903747",
+                "Type": "series",
+                "Poster": "https://m.media-amazon.com/images/M/MV5BYmQ4YWMxYjUtNjZmYi00MDQ1LWFjMjMtNjA5ZDdiYjdiODU5XkEyXkFqcGdeQXVyMTMzNDExODE5._V1_SX300.jpg"
+            },
+            {
+                "Title": "El Camino: A Breaking Bad Movie",
+                "Year": "2019",
+                "imdbID": "tt9243946",
+                "Type": "movie",
+                "Poster": "https://m.media-amazon.com/images/M/MV5BNjk4MzVlM2UtZGM0ZC00M2M1LThkMWEtZjUyN2U2ZTc0NmM5XkEyXkFqcGdeQXVyOTAzMTc2MjA@._V1_SX300.jpg"
+            },
+            {
+                "Title": "The Road to El Camino: Behind the Scenes of El Camino: A Breaking Bad Movie",
+                "Year": "2019",
+                "imdbID": "tt11151792",
+                "Type": "movie",
+                "Poster": "https://m.media-amazon.com/images/M/MV5BNDEwNTgyM2MtYzA0ZS00ODU0LWFlMmEtN2NkYzNlNjRhNzJmXkEyXkFqcGdeQXVyMTExNzkxOTY@._V1_SX300.jpg"
+            }
+        ],
+        "totalResults": "3",
+        "Response": "True"
+    }
+  }
+}
 
 describe('Review model', function (){
   
@@ -262,6 +322,164 @@ describe('Review controllers', function () {
       // Check if stub has been called with correct arguments
       expect(stub.calledOnce).to.be.true;
       expect(stub.calledWith(3)).to.be.true;
+
+      stub.restore();
+    });
+  });
+});
+
+describe('Movie controller', function() {
+  describe('searchMovie', function() {
+    it('should search movies by its title, returning coincidences', async function() {
+      const req = {
+        query: {
+          title: 'Breaking Bad'
+        }
+      }
+
+      const res = {
+        json: sinon.spy()
+      }
+
+      // Make a sinon.stub to axios call
+      var stub = sinon.stub(axios, 'get');
+      stub.returns(getMovies());
+
+      await searchMovie(req, res);
+
+      expect(res.json.calledOnce).to.be.true;
+      // Check that API data has been transformed correctly
+      expect(JSON.stringify(res.json.firstCall.args[0])).to.equal(JSON.stringify([
+        {
+            "Title": "Breaking Bad",
+            "Year": "2008-2013",
+            "ExternalID": "tt0903747",
+            "Type": "series",
+            "Image": "https://m.media-amazon.com/images/M/MV5BYmQ4YWMxYjUtNjZmYi00MDQ1LWFjMjMtNjA5ZDdiYjdiODU5XkEyXkFqcGdeQXVyMTMzNDExODE5._V1_SX300.jpg"
+        },
+        {
+            "Title": "El Camino: A Breaking Bad Movie",
+            "Year": "2019",
+            "ExternalID": "tt9243946",
+            "Type": "movie",
+            "Image": "https://m.media-amazon.com/images/M/MV5BNjk4MzVlM2UtZGM0ZC00M2M1LThkMWEtZjUyN2U2ZTc0NmM5XkEyXkFqcGdeQXVyOTAzMTc2MjA@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Road to El Camino: Behind the Scenes of El Camino: A Breaking Bad Movie",
+            "Year": "2019",
+            "ExternalID": "tt11151792",
+            "Type": "movie",
+            "Image": "https://m.media-amazon.com/images/M/MV5BNDEwNTgyM2MtYzA0ZS00ODU0LWFlMmEtN2NkYzNlNjRhNzJmXkEyXkFqcGdeQXVyMTExNzkxOTY@._V1_SX300.jpg"
+        }
+      ]));
+      expect(stub.calledOnce).to.be.true;
+      // Check that url used contains: http://www.omdbapi.com/?s=Breaking Bad
+      expect(stub.calledWithMatch('http://www.omdbapi.com/?s=Breaking Bad')).to.be.true;
+
+      stub.restore();
+    });
+
+    it('should return an empty array if an error occurs', async function() {
+      const req = {
+        query: {
+          title: 'Breaking Bad'
+        }
+      }
+
+      const res = {
+        json: sinon.spy()
+      }
+
+      // Make a sinon.stub to axios call to throw an error
+      var stub = sinon.stub(axios, 'get');
+      stub.throws()
+
+      await searchMovie(req, res);
+
+      expect(res.json.firstCall.args[0]).to.eql([]);
+      expect(stub.calledOnce).to.be.true;
+
+      stub.restore();
+    });
+
+    it('should return an empty array if no title passed', async function() {
+      const req = {
+      }
+
+      const res = {
+        json: sinon.spy()
+      }
+
+      await searchMovie(req, res);
+
+      expect(res.json.firstCall.args[0]).to.eql([]);
+
+    });
+  });
+
+  describe('getMovie', function() {
+    it('should get movie details', async function() {
+      const req = {
+        params: {
+          id: 3
+        }
+      }
+
+      const res = {
+        json: sinon.spy()
+      }
+
+      // Make a sinon.stub to axios call
+      var stub = sinon.stub(axios, 'get');
+      stub.returns(getMovieData());
+      
+      await getMovie(req, res);
+
+      expect(res.json.calledOnce).to.be.true;
+      // Check that API data has been transformed correctly
+      expect(JSON.stringify(res.json.firstCall.args[0])).to.equal(JSON.stringify(
+        {
+          "Title": "Breaking Bad",
+          "Year": "2008-2013",
+          "Genre": "Crime, Drama, Thriller",
+          "Director": "N/A",
+          "Writer": "Vince Gilligan",
+          "Actors": "Bryan Cranston, Aaron Paul, Anna Gunn",
+          "Description": "A chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing and selling methamphetamine with a former student in order to secure his family's future.",
+          "Image": "https://m.media-amazon.com/images/M/MV5BYmQ4YWMxYjUtNjZmYi00MDQ1LWFjMjMtNjA5ZDdiYjdiODU5XkEyXkFqcGdeQXVyMTMzNDExODE5._V1_SX300.jpg",
+          "ExternalID": "tt0903747",
+          "Type": "series",
+          "Seasons": "5",
+        }
+      ));
+
+      expect(stub.calledOnce).to.be.true;
+      // Check that url used contains: http://www.omdbapi.com/?i=3
+      expect(stub.calledWithMatch('http://www.omdbapi.com/?i=3')).to.be.true;
+
+      stub.restore();
+    });
+
+    it('should return an empty object if an error occurs', async function() {
+      const req = {
+        params: {
+          id: 3
+        }
+      }
+
+      const res = {
+        json: sinon.spy()
+      }
+
+      // Make a sinon.stub to axios call
+      var stub = sinon.stub(axios, 'get');
+      stub.throws();
+      
+      await getMovie(req, res);
+
+      expect(res.json.calledOnce).to.be.true;
+      expect(res.json.firstCall.args[0]).to.eql({});
+      expect(stub.calledOnce).to.be.true;
 
       stub.restore();
     });
