@@ -1,7 +1,7 @@
 const axios = require('axios');
 const config = require('../config/config.js');
 
-async function searchMovie(req, res) {
+async function searchMedia(req, res) {
     const { title } = req.query || {};
 
     try {
@@ -28,7 +28,7 @@ async function searchMovie(req, res) {
     return res.json([]);
 }
 
-async function getMovie(req, res) {
+async function getMedia(req, res) {
     var movie = {}
     const externalID = req.params.id;
 
@@ -62,4 +62,4 @@ async function getMovie(req, res) {
     return res.json({});
 }
 
-module.exports = { searchMovie, getMovie };
+module.exports = { searchMedia, getMedia };

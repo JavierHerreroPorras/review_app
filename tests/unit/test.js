@@ -3,7 +3,7 @@ const sequelize = require('../../src/config/database.js');
 const { Op } = require("sequelize");
 const Review = require('../../src/models/review.js');
 const { createReview, getAllReviews, getReview } = require('../../src/controllers/review.js');
-const { searchMovie, getMovie } = require('../../src/controllers/movie.js');
+const { searchMedia, getMedia } = require('../../src/controllers/media.js');
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -13,7 +13,7 @@ const axios = require('axios');
 
 chai.use(chaiHttp);
 
-function getMovieData(){
+function getMediaData(){
   return {
     data: {
       "Title": "Breaking Bad",
@@ -39,7 +39,7 @@ function getMovieData(){
   }
 }
 
-function getMovies(){
+function getMedias(){
   return {
     data: {
         "Search": [
@@ -328,8 +328,8 @@ describe('Review controllers', function () {
   });
 });
 
-describe('Movie controller', function() {
-  describe('searchMovie', function() {
+describe('Media controller', function() {
+  describe('searchMedia', function() {
     it('should search movies by its title, returning coincidences', async function() {
       const req = {
         query: {
@@ -343,9 +343,9 @@ describe('Movie controller', function() {
 
       // Make a sinon.stub to axios call
       var stub = sinon.stub(axios, 'get');
-      stub.returns(getMovies());
+      stub.returns(getMedias());
 
-      await searchMovie(req, res);
+      await searchMedia(req, res);
 
       expect(res.json.calledOnce).to.be.true;
       // Check that API data has been transformed correctly
@@ -394,7 +394,7 @@ describe('Movie controller', function() {
       var stub = sinon.stub(axios, 'get');
       stub.throws()
 
-      await searchMovie(req, res);
+      await searchMedia(req, res);
 
       expect(res.json.firstCall.args[0]).to.eql([]);
       expect(stub.calledOnce).to.be.true;
@@ -410,14 +410,14 @@ describe('Movie controller', function() {
         json: sinon.spy()
       }
 
-      await searchMovie(req, res);
+      await searchMedia(req, res);
 
       expect(res.json.firstCall.args[0]).to.eql([]);
 
     });
   });
 
-  describe('getMovie', function() {
+  describe('getMedia', function() {
     it('should get movie details', async function() {
       const req = {
         params: {
@@ -431,9 +431,9 @@ describe('Movie controller', function() {
 
       // Make a sinon.stub to axios call
       var stub = sinon.stub(axios, 'get');
-      stub.returns(getMovieData());
+      stub.returns(getMediaData());
       
-      await getMovie(req, res);
+      await getMedia(req, res);
 
       expect(res.json.calledOnce).to.be.true;
       // Check that API data has been transformed correctly
@@ -475,7 +475,7 @@ describe('Movie controller', function() {
       var stub = sinon.stub(axios, 'get');
       stub.throws();
       
-      await getMovie(req, res);
+      await getMedia(req, res);
 
       expect(res.json.calledOnce).to.be.true;
       expect(res.json.firstCall.args[0]).to.eql({});
