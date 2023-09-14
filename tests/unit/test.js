@@ -330,7 +330,7 @@ describe('Review controllers', function () {
 
 describe('Media controller', function() {
   describe('searchMedia', function() {
-    it('should search movies by its title, returning coincidences', async function() {
+    it('should search media by its title, returning coincidences', async function() {
       const req = {
         query: {
           title: 'Breaking Bad'
@@ -415,6 +415,69 @@ describe('Media controller', function() {
       expect(res.json.firstCall.args[0]).to.eql([]);
 
     });
+
+    it('should filter media by not including other types than movie or series', async function() {
+      const req = {
+        query: {
+          title: 'Breaking Bad'
+        }
+      }
+
+      const res = {
+        json: sinon.spy()
+      }
+
+      // Make a sinon.stub to axios call
+      var stub = sinon.stub(axios, 'get');
+      stub.returns({
+        data: {
+            "Search": [
+                {
+                    "Title": "Breaking Bad",
+                    "Type": "series",
+                },
+                {
+                  "Title": "Breaking Bad: The game",
+                  "Type": "game",
+                },
+                {
+                    "Title": "El Camino: A Breaking Bad Movie",
+                    "Type": "movie",
+                },
+                {
+                    "Title": "The Road to El Camino: Behind the Scenes of El Camino: A Breaking Bad Movie",
+                    "Type": "movie",
+                }
+            ],
+            "totalResults": "4",
+            "Response": "True"
+        }
+      });
+
+      await searchMedia(req, res);
+
+      expect(res.json.calledOnce).to.be.true;
+      // Check that API data has been transformed correctly
+      expect(JSON.stringify(res.json.firstCall.args[0])).to.equal(JSON.stringify([
+        {
+          "Title": "Breaking Bad",
+          "Type": "series",
+        },
+        {
+            "Title": "El Camino: A Breaking Bad Movie",
+            "Type": "movie",
+        },
+        {
+            "Title": "The Road to El Camino: Behind the Scenes of El Camino: A Breaking Bad Movie",
+            "Type": "movie",
+        }
+      ]));
+      expect(stub.calledOnce).to.be.true;
+      // Check that url used contains: http://www.omdbapi.com/?s=Breaking Bad
+      expect(stub.calledWithMatch('http://www.omdbapi.com/?s=Breaking Bad')).to.be.true;
+
+      stub.restore();
+    });
   });
 
   describe('getMedia', function() {
@@ -452,6 +515,40 @@ describe('Media controller', function() {
           "Seasons": "5",
         }
       ));
+
+      expect(stub.calledOnce).to.be.true;
+      // Check that url used contains: http://www.omdbapi.com/?i=3
+      expect(stub.calledWithMatch('http://www.omdbapi.com/?i=3')).to.be.true;
+
+      stub.restore();
+    });
+
+    it('should return an empty object if media type is not movie or series', async function() {
+      const req = {
+        params: {
+          id: 3
+        }
+      }
+
+      const res = {
+        json: sinon.spy()
+      }
+
+      // Make a sinon.stub to axios call
+      var stub = sinon.stub(axios, 'get');
+      stub.returns({
+        data: {
+          "Title": "League of Legends",
+          "Type": "game",
+          "Response": "True"
+        }
+      });
+      
+      await getMedia(req, res);
+
+      expect(res.json.calledOnce).to.be.true;
+      // Check that API data has been transformed correctly
+      expect(res.json.firstCall.args[0]).to.eql({});
 
       expect(stub.calledOnce).to.be.true;
       // Check that url used contains: http://www.omdbapi.com/?i=3

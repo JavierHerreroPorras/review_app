@@ -9,15 +9,18 @@ async function searchMedia(req, res) {
             const apiRes = await axios.get(`http://www.omdbapi.com/?s=${title}&apikey=${config.OMDB_API_KEY}`);
 
             if (apiRes.data.Response === 'True') {
-                return res.json(apiRes.data.Search.map(item => {
-                    return {
-                        Title: item.Title,
-                        Year: item.Year,
-                        ExternalID: item.imdbID,
-                        Type: item.Type,
-                        Image: item.Poster
+                return res.json(apiRes.data.Search.reduce((result, item) => {
+                    if (['movie', 'series'].includes(item.Type.toLowerCase())) {
+                        result.push({
+                            Title: item.Title,
+                            Year: item.Year,
+                            ExternalID: item.imdbID,
+                            Type: item.Type,
+                            Image: item.Poster
+                        });
                     }
-                }));
+                    return result;
+                }, []));
             }
         }
 
@@ -35,7 +38,7 @@ async function getMedia(req, res) {
     try {
         if (externalID) {
             var apiRes = await axios.get(`http://www.omdbapi.com/?i=${externalID}&apikey=${config.OMDB_API_KEY}`);
-            if (apiRes.data.Response === 'True') {
+            if (apiRes.data.Response === 'True' && ['movie', 'series'].includes(apiRes.data.Type.toLowerCase())) {
                 movie = apiRes.data;
 
                 return res.json(
