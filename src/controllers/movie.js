@@ -1,11 +1,12 @@
 const axios = require('axios');
+const config = require('../config/config.js');
 
 async function searchMovie(req, res) {
     const { title } = req.query || {};
 
     try {
         if (title) {
-            const apiRes = await axios.get(`http://www.omdbapi.com/?s=${title}&apikey=`);
+            const apiRes = await axios.get(`http://www.omdbapi.com/?s=${title}&apikey=${config.OMDB_API_KEY}`);
 
             if (apiRes.data.Response === 'True') {
                 return res.json(apiRes.data.Search.map(item => {
@@ -33,7 +34,7 @@ async function getMovie(req, res) {
 
     try {
         if (externalID) {
-            var apiRes = await axios.get(`http://www.omdbapi.com/?i=${externalID}&apikey=`);
+            var apiRes = await axios.get(`http://www.omdbapi.com/?i=${externalID}&apikey=${config.OMDB_API_KEY}`);
             if (apiRes.data.Response === 'True') {
                 movie = apiRes.data;
 

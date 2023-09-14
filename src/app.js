@@ -1,3 +1,6 @@
+// Initialize config env vars
+require('dotenv').config()
+
 const express = require('express');
 const sequelize = require('./config/database.js');
 const configureRoutes = require('./routes/base.js');
