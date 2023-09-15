@@ -9,7 +9,10 @@ npm install
 npm start
 ```
 
+
 ## Testing
+
+
 Run all unit and integration tests using Mocha, Chai and Sinon packages.
 ```
 npm test
@@ -36,3 +39,9 @@ Describes an user's evaluation of a media content. Model fields:
 - `rating`: Integer range from 0 to 10.
 - `opinion`: String.
 - `watched_at`: Datetime.
+
+
+## Improvement
+- Set a relationship between API media and reviews, by using a new field `externalID`.
+- Allow reviews edition and deletion.
+- Add users.
