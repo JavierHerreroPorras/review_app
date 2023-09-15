@@ -75,7 +75,7 @@ describe('Reviews API', function () {
     await Review.createInstance('Review 1', 'movie', 8, 'Good movie', new Date());
     await Review.createInstance('Review 2', 'anime', 7, 'Interesting anime', new Date());
 
-    const res = await chai.request(app).get('/reviews');
+    const res = await chai.request(app).get('/api/reviews');
 
     expect(res).to.have.status(200);
     expect(res.body).to.be.an('array');
@@ -87,7 +87,7 @@ describe('Reviews API', function () {
     await Review.createInstance('Review 2', 'anime', 7, 'Interesting anime', new Date());
     await Review.createInstance('Review 2.2', 'anime', 7, 'Interesting anime', new Date());
 
-    const res = await chai.request(app).get('/reviews?title=Review 2');
+    const res = await chai.request(app).get('/api/reviews?title=Review 2');
 
     expect(res).to.have.status(200);
     expect(res.body).to.be.an('array');
@@ -101,7 +101,7 @@ describe('Reviews API', function () {
     await Review.createInstance('Review 2', 'anime', 7, 'Interesting anime', new Date());
     await Review.createInstance('Review 2.2', 'anime', 7, 'Interesting anime', new Date());
 
-    const res = await chai.request(app).get('/reviews?type=movie');
+    const res = await chai.request(app).get('/api/reviews?type=movie');
 
     expect(res).to.have.status(200);
     expect(res.body).to.be.an('array');
@@ -115,7 +115,7 @@ describe('Reviews API', function () {
     await Review.createInstance('Review 2', 'anime', 7, 'Interesting anime', new Date());
     await Review.createInstance('Review 2.2', 'anime', 4, 'Interesting anime', new Date());
 
-    const res = await chai.request(app).get('/reviews?rating=5');
+    const res = await chai.request(app).get('/api/reviews?rating=5');
 
     expect(res).to.have.status(200);
     expect(res.body).to.be.an('array');
@@ -129,7 +129,7 @@ describe('Reviews API', function () {
     await Review.createInstance('Review 2', 'anime', 7, 'Interesting anime', new Date());
     await Review.createInstance('Review 2.2', 'anime', 4, 'Interesting anime', new Date());
 
-    const res = await chai.request(app).get('/reviews?rating=5');
+    const res = await chai.request(app).get('/api/reviews?rating=5');
 
     expect(res).to.have.status(200);
     expect(res.body).to.be.an('array');
@@ -143,7 +143,7 @@ describe('Reviews API', function () {
     await Review.createInstance('Review 2', 'anime', 7, 'Interesting anime', new Date());
     await Review.createInstance('Review 2.2', 'anime', 4, 'Interesting anime', new Date());
 
-    const res = await chai.request(app).get('/reviews?rating=5&type=anime');
+    const res = await chai.request(app).get('/api/reviews?rating=5&type=anime');
 
     expect(res).to.have.status(200);
     expect(res.body).to.be.an('array');
@@ -162,7 +162,7 @@ describe('Reviews API', function () {
         throw new Error('Error for test');
     }
 
-    const res = await chai.request(app).get('/reviews?rating=5');
+    const res = await chai.request(app).get('/api/reviews?rating=5');
 
     expect(res).to.have.status(500);
     expect(res.body).to.deep.equal({ error: 'Internal Server Error' });
@@ -175,7 +175,7 @@ describe('Reviews API', function () {
     const review = await Review.createInstance('Review 1', 'movie', 8, 'Good movie', new Date());
     await Review.createInstance('Review 2', 'anime', 7, 'Interesting anime', new Date());
 
-    const res = await chai.request(app).get(`/reviews/${review.id}`);
+    const res = await chai.request(app).get(`/api/reviews/${review.id}`);
 
     expect(res).to.have.status(200);
     expect(res.body).to.be.an('object');
@@ -195,7 +195,7 @@ describe('Reviews API', function () {
       watched_at: new Date(),
     };
 
-    const res = await chai.request(app).post('/reviews').send(newReview);
+    const res = await chai.request(app).post('/api/reviews').send(newReview);
 
     expect(res).to.have.status(200);
     expect(res.body).to.be.an('object');
@@ -212,7 +212,7 @@ describe('Movies API', function() {
     var stub = sinon.stub(axios, 'get');
     stub.returns(getMedias());
 
-    const res = await chai.request(app).get('/media?title=Breaking Bad');
+    const res = await chai.request(app).get('/api/media?title=Breaking Bad');
 
     expect(res).to.have.status(200);
     expect(res.body).to.be.an('array');
@@ -226,7 +226,7 @@ describe('Movies API', function() {
     var stub = sinon.stub(axios, 'get');
     stub.returns(getMediaData());
     
-    const res = await chai.request(app).get('/media/tt0903747/');
+    const res = await chai.request(app).get('/api/media/tt0903747/');
 
     expect(res).to.have.status(200);
     expect(res.body).to.be.an('object');
