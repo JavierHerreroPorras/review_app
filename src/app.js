@@ -7,6 +7,10 @@ const configureRoutes = require('./routes/base.js');
 
 var app = express();
 
+// set view engine to ejs
+app.set('view engine', 'ejs');
+app.set('views', 'src/templates');
+
 app.use(express.json());
 
 
