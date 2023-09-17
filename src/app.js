@@ -2,6 +2,7 @@
 require('dotenv').config()
 
 const express = require('express');
+const bodyParser = require('body-parser');
 const sequelize = require('./config/database.js');
 const configureRoutes = require('./routes/base.js');
 
@@ -11,7 +12,7 @@ var app = express();
 app.set('view engine', 'ejs');
 app.set('views', 'src/templates');
 
-app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
 const initializeDb = async () => {
