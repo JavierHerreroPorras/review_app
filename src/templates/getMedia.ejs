@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Aplicación de reseñas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <div class="container mt-5">
+
+        <h3>Detalles de <%= media.Title %></h3>
+
+        <div class="mt-5">
+            <div class="row">
+                <div class="col">
+                    <table class="table table-borderless">
+                        <tbody>
+                          <tr>
+                            <th rowspan="7" class="py-0"><img src="<%= media.Image %>" class="rounded" style="max-height: 350px;"/></th>
+                            <th class="table-info" scope="row">Año de lanzamiento</th>
+                            <td class="table-info"><%= media.Year %></td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Género</th>
+                            <td><%= media.Genre %></td>
+                          </tr>
+                          <tr>
+                            <th class="table-info" scope="row">Escrita por</th>
+                            <td class="table-info"><%= media.Writer %></td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Dirigida por</th>
+                            <td><%= media.Director %></td>
+                          </tr>
+                          <tr>
+                            <th class="table-info" scope="row">Actores</th>
+                            <td class="table-info"><%= media.Actors %></td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Sinopsis</th>
+                            <td><%= media.Description %></td>
+                          </tr>
+                          <% if(media.Seasons){ %>
+                            <tr>
+                                <th class="table-info" scope="row">Total de temporadas</th>
+                                <td class="table-info"><%= media.Seasons %></td>
+                            </tr>
+                          <% } %>
+                        </tbody>
+                      </table>
+                </div>
+            </div>
+        </div>
+        
+
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  
+  </body>
+</html>
