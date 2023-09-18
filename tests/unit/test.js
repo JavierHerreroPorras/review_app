@@ -3,7 +3,7 @@ const sequelize = require('../../src/config/database.js');
 const { Op } = require("sequelize");
 const Review = require('../../src/models/review.js');
 const { apiCreateReview, apiGetAllReviews, apiGetReview } = require('../../src/controllers/review.js');
-const { searchMedia, getMedia } = require('../../src/controllers/media.js');
+const { apiSearchMedia, apiGetMedia } = require('../../src/controllers/media.js');
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -13,7 +13,7 @@ const axios = require('axios');
 
 chai.use(chaiHttp);
 
-function getMediaData(){
+function apiGetMediaData(){
   return {
     data: {
       "Title": "Breaking Bad",
@@ -39,7 +39,7 @@ function getMediaData(){
   }
 }
 
-function getMedias(){
+function apiGetMedias(){
   return {
     data: {
         "Search": [
@@ -331,7 +331,7 @@ describe('Review controllers', function () {
 });
 
 describe('Media controller', function() {
-  describe('searchMedia', function() {
+  describe('apiSearchMedia', function() {
     it('should search media by its title, returning coincidences', async function() {
       const req = {
         query: {
@@ -345,9 +345,9 @@ describe('Media controller', function() {
 
       // Make a sinon.stub to axios call
       var stub = sinon.stub(axios, 'get');
-      stub.returns(getMedias());
+      stub.returns(apiGetMedias());
 
-      await searchMedia(req, res);
+      await apiSearchMedia(req, res);
 
       expect(res.json.calledOnce).to.be.true;
       // Check that API data has been transformed correctly
@@ -396,7 +396,7 @@ describe('Media controller', function() {
       var stub = sinon.stub(axios, 'get');
       stub.throws()
 
-      await searchMedia(req, res);
+      await apiSearchMedia(req, res);
 
       expect(res.json.firstCall.args[0]).to.eql([]);
       expect(stub.calledOnce).to.be.true;
@@ -412,7 +412,7 @@ describe('Media controller', function() {
         json: sinon.spy()
       }
 
-      await searchMedia(req, res);
+      await apiSearchMedia(req, res);
 
       expect(res.json.firstCall.args[0]).to.eql([]);
 
@@ -456,7 +456,7 @@ describe('Media controller', function() {
         }
       });
 
-      await searchMedia(req, res);
+      await apiSearchMedia(req, res);
 
       expect(res.json.calledOnce).to.be.true;
       // Check that API data has been transformed correctly
@@ -482,7 +482,7 @@ describe('Media controller', function() {
     });
   });
 
-  describe('getMedia', function() {
+  describe('apiGetMedia', function() {
     it('should get movie details', async function() {
       const req = {
         params: {
@@ -496,9 +496,9 @@ describe('Media controller', function() {
 
       // Make a sinon.stub to axios call
       var stub = sinon.stub(axios, 'get');
-      stub.returns(getMediaData());
+      stub.returns(apiGetMediaData());
       
-      await getMedia(req, res);
+      await apiGetMedia(req, res);
 
       expect(res.json.calledOnce).to.be.true;
       // Check that API data has been transformed correctly
@@ -546,7 +546,7 @@ describe('Media controller', function() {
         }
       });
       
-      await getMedia(req, res);
+      await apiGetMedia(req, res);
 
       expect(res.json.calledOnce).to.be.true;
       // Check that API data has been transformed correctly
@@ -574,7 +574,7 @@ describe('Media controller', function() {
       var stub = sinon.stub(axios, 'get');
       stub.throws();
       
-      await getMedia(req, res);
+      await apiGetMedia(req, res);
 
       expect(res.json.calledOnce).to.be.true;
       expect(res.json.firstCall.args[0]).to.eql({});

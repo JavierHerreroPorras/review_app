@@ -8,7 +8,7 @@ const axios = require('axios');
 const { expect } = chai;
 chai.use(chaiHttp);
 
-function getMediaData(){
+function apiGetMediaData(){
   return {
     data: {
       "Title": "Breaking Bad",
@@ -34,7 +34,7 @@ function getMediaData(){
   }
 }
 
-function getMedias(){
+function apiGetMedias(){
   return {
     data: {
         "Search": [
@@ -210,7 +210,7 @@ describe('Movies API', function() {
   it('should search movies by its title, returning coincidences', async function() {
     // Make a sinon.stub to axios call
     var stub = sinon.stub(axios, 'get');
-    stub.returns(getMedias());
+    stub.returns(apiGetMedias());
 
     const res = await chai.request(app).get('/api/media?title=Breaking Bad');
 
@@ -224,7 +224,7 @@ describe('Movies API', function() {
   it('should get movie details by its external id', async function() {
     // Make a sinon.stub to axios call
     var stub = sinon.stub(axios, 'get');
-    stub.returns(getMediaData());
+    stub.returns(apiGetMediaData());
     
     const res = await chai.request(app).get('/api/media/tt0903747/');
 

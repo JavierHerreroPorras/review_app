@@ -1,7 +1,7 @@
 const axios = require('axios');
 const config = require('../config/config.js');
 
-async function searchMedia(req, res) {
+async function apiSearchMedia(req, res) {
     const { title } = req.query || {};
 
     try {
@@ -31,38 +31,44 @@ async function searchMedia(req, res) {
     return res.json([]);
 }
 
-async function getMedia(req, res) {
+async function getMedia(req, res){
     var movie = {}
     const externalID = req.params.id;
 
-    try {
+    try{
         if (externalID) {
             var apiRes = await axios.get(`http://www.omdbapi.com/?i=${externalID}&apikey=${config.OMDB_API_KEY}`);
             if (apiRes.data.Response === 'True' && ['movie', 'series'].includes(apiRes.data.Type.toLowerCase())) {
                 movie = apiRes.data;
 
-                return res.json(
-                    {
-                        Title: movie.Title,
-                        Year: movie.Year,
-                        Genre: movie.Genre,
-                        Director: movie.Director,
-                        Writer: movie.Writer,
-                        Actors: movie.Actors,
-                        Description: movie.Plot,
-                        Image: movie.Poster,
-                        ExternalID: movie.imdbID,
-                        Type: movie.Type,
-                        Seasons: movie.totalSeasons
-                    }
-                );
+                return {
+                    Title: movie.Title,
+                    Year: movie.Year,
+                    Genre: movie.Genre,
+                    Director: movie.Director,
+                    Writer: movie.Writer,
+                    Actors: movie.Actors,
+                    Description: movie.Plot,
+                    Image: movie.Poster,
+                    ExternalID: movie.imdbID,
+                    Type: movie.Type,
+                    Seasons: movie.totalSeasons
+                }
             }
         }
-    } catch (error) {
-        //console.log(error);
+    } catch(error){
+        // console.log(error)
     }
 
-    return res.json({});
+    return {};
+}
+async function apiGetMedia(req, res) {
+    return res.json(await getMedia(req, res));
 }
 
-module.exports = { searchMedia, getMedia };
+async function viewGetMedia(req, res){
+    const media = await getMedia(req, res);
+    return res.render('getMedia', {media: media});
+}
+
+module.exports = { apiSearchMedia, apiGetMedia, viewGetMedia };
