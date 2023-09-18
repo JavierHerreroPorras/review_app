@@ -2,7 +2,7 @@ var assert = require('assert');
 const sequelize = require('../../src/config/database.js');
 const { Op } = require("sequelize");
 const Review = require('../../src/models/review.js');
-const { createReview, getAllReviews, getReview } = require('../../src/controllers/review.js');
+const { apiCreateReview, apiGetAllReviews, apiGetReview } = require('../../src/controllers/review.js');
 const { searchMedia, getMedia } = require('../../src/controllers/media.js');
 
 const chai = require('chai');
@@ -89,13 +89,15 @@ describe('Review model', function (){
 
   it('creation method should return an instance', async function (){
     const watched_at = new Date('2023-09-17').setHours(0, 0, 0, 0);
-    const barbieReview = await Review.createInstance('Barbie', 'movie', 8, 'An interesting movie', watched_at);
+    const barbieReview = await Review.createInstance('Barbie', 'movie', 8, 'An interesting movie', watched_at, 'a1b2ced4', 'http://image.url');
 
     assert.strictEqual(barbieReview.title, 'Barbie');
     assert.strictEqual(barbieReview.type, 'movie');
     assert.strictEqual(barbieReview.rating, 8);
     assert.strictEqual(barbieReview.opinion, 'An interesting movie');
     assert.strictEqual(new Date(barbieReview.watched_at).setHours(0, 0, 0, 0), watched_at);
+    assert.strictEqual(barbieReview.external_id, 'a1b2ced4');
+    assert.strictEqual(barbieReview.image, 'http://image.url');
   });
 
   it('creation method should create an instance in the database', async function (){
@@ -131,7 +133,7 @@ describe('Review model', function (){
 });
 
 describe('Review controllers', function () {
-  describe('createReview', function () {
+  describe('apiCreateReview', function () {
     it('should create a new review', async function () {
       // Create a fake request and a fake response
       const req = {
@@ -147,7 +149,7 @@ describe('Review controllers', function () {
         json: sinon.spy()
       }
 
-      await createReview(req, res);
+      await apiCreateReview(req, res);
 
       // Check response review properties
       expect(res.json.calledOnce).to.be.true;
@@ -156,7 +158,7 @@ describe('Review controllers', function () {
     });
   });
 
-  describe('getAllReviews', function () {
+  describe('apiGetAllReviews', function () {
     it('should get all reviews', async function () {
       // Create a fake request and a fake response
       const req = {}
@@ -168,7 +170,7 @@ describe('Review controllers', function () {
       var stub = sinon.stub(Review, 'findAll');
       stub.returns(['Review 1', 'Review 2']);
 
-      await getAllReviews(req, res);
+      await apiGetAllReviews(req, res);
 
       // Check response array properties
       expect(res.json.calledOnce).to.be.true;
@@ -191,7 +193,7 @@ describe('Review controllers', function () {
       const findAllStub = sinon.stub(Review, 'findAll');
       findAllStub.returns([{ id: 1, title: 'ExampleName' }]);
 
-      await getAllReviews(req, res);
+      await apiGetAllReviews(req, res);
 
       expect(findAllStub.calledOnce).to.be.true;
       expect(findAllStub.firstCall.args[0].where.title[Op.substring]).to.equal('ExampleName');
@@ -215,7 +217,7 @@ describe('Review controllers', function () {
       const findAllStub = sinon.stub(Review, 'findAll');
       findAllStub.returns([{ id: 1, title: 'ExampleName' }]);
 
-      await getAllReviews(req, res);
+      await apiGetAllReviews(req, res);
 
       expect(findAllStub.calledOnce).to.be.true;
       expect(findAllStub.firstCall.args[0].where.title[Op.substring]).to.equal('ExampleName');
@@ -239,7 +241,7 @@ describe('Review controllers', function () {
       const findAllStub = sinon.stub(Review, 'findAll');
       findAllStub.returns([{ id: 1, title: 'Movie 1' }, { id: 2, title: 'Movie 2' }]);
 
-      await getAllReviews(req, res);
+      await apiGetAllReviews(req, res);
 
       expect(findAllStub.calledOnce).to.be.true;
       expect(findAllStub.firstCall.args[0].where.type).to.equal('movie');
@@ -263,7 +265,7 @@ describe('Review controllers', function () {
       const findAllStub = sinon.stub(Review, 'findAll');
       findAllStub.returns([{ id: 1, title: 'Movie 1' }, { id: 2, title: 'Movie 2' }]);
 
-      await getAllReviews(req, res);
+      await apiGetAllReviews(req, res);
 
       expect(findAllStub.calledOnce).to.be.true;
       expect(findAllStub.firstCall.args[0].where.rating[Op.gte]).to.equal(5);
@@ -288,7 +290,7 @@ describe('Review controllers', function () {
       const findAllStub = sinon.stub(Review, 'findAll');
       findAllStub.returns([{ id: 1, title: 'Anime 1' }, { id: 2, title: 'Anime 2' }]);
 
-      await getAllReviews(req, res);
+      await apiGetAllReviews(req, res);
 
       expect(findAllStub.calledOnce).to.be.true;
       expect(findAllStub.firstCall.args[0].where.rating[Op.gte]).to.equal(5);
@@ -296,7 +298,7 @@ describe('Review controllers', function () {
     })
   });
 
-  describe('getReview', function () {
+  describe('apiGetReview', function () {
     it('should get a review by its id', async function () {
       // Create a fake request and a fake response
       const req = {
@@ -312,7 +314,7 @@ describe('Review controllers', function () {
       var stub = sinon.stub(Review, 'findByPk')
       stub.returns('Review_3');
 
-      await getReview(req, res);
+      await apiGetReview(req, res);
 
       // Check response
       expect(res.json.calledOnce).to.be.true;

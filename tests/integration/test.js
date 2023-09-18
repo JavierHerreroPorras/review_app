@@ -195,13 +195,13 @@ describe('Reviews API', function () {
       watched_at: new Date(),
     };
 
-    const res = await chai.request(app).post('/api/reviews').send(newReview);
+    const res = await chai.request(app).post('/api/reviews').type('form').send(newReview);
 
     expect(res).to.have.status(200);
     expect(res.body).to.be.an('object');
     expect(res.body).to.have.property('title').equal('New Review');
     expect(res.body).to.have.property('type').equal('movie');
-    expect(res.body).to.have.property('rating').equal(9);
+    expect(res.body).to.have.property('rating').equal('9');
     expect(res.body).to.have.property('opinion').equal('Excellent movie');
   });
 });
