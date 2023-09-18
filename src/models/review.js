@@ -30,11 +30,17 @@ Review.init({
     watched_at: {
         type: DataTypes.DATEONLY,
         defaultValue: DataTypes.NOW
+    },
+    external_id: {
+        type: DataTypes.STRING,
+    },
+    image: {
+        type: DataTypes.STRING
     }
 }, { modelName: 'Review', sequelize });
 
-Review.createInstance = async function (name, type, rating, opinion, watched_at) {
-    const review = await Review.create({title: name, type: type, rating: rating, opinion: opinion, watched_at: watched_at});
+Review.createInstance = async function (name, type, rating, opinion, watched_at, external_id, image) {
+    const review = await Review.create({title: name, type: type, rating: rating, opinion: opinion, watched_at: watched_at, external_id: external_id, image: image});
     return review;
 }
 
