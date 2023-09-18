@@ -1,17 +1,17 @@
 const { searchMedia, getMedia } = require('../controllers/media.js');
-const { createReview, getAllReviews, getReview } = require('../controllers/review.js');
+const { apiCreateReview, apiGetAllReviews, apiGetReview, viewGetAllReviews, viewCreateReview } = require('../controllers/review.js');
 
 function configureRoutes(app) {
 
-    app.get('/', (req, res) => {
-        res.render('index');
-    })    
-
-    app.get('/api/reviews', getAllReviews);
+    app.get('/', viewGetAllReviews);  
     
-    app.post('/api/reviews', createReview);
+    app.get('/reviews/new', viewCreateReview);
 
-    app.get('/api/reviews/:id([0-9]+)', getReview);
+    app.get('/api/reviews', apiGetAllReviews);
+    
+    app.post('/api/reviews', apiCreateReview);
+
+    app.get('/api/reviews/:id([0-9]+)', apiGetReview);
 
     app.get('/api/media', searchMedia);
 
