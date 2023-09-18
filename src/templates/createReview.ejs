@@ -189,15 +189,19 @@
                             listItem.innerHTML = `
                                 <div class="card mb-3 result-link" style="max-width: 540px;" data-title="${result.Title}" data-type="${result.Type}" data-id="${result.ExternalID}">
                                     <div class="row g-0">
-                                    <div class="col-md-4">
-                                        <img src="${result.Image}" class="rounded-start" style="width: 80%;"/>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="card-body">
-                                            <h5 class="card-title">${result.Title}</h5>
-                                            <p class="card-text">${result.Year}</p>
+                                        <div class="col-md-4">
+                                            <img src="${result.Image}" class="rounded-start img-fluid" style="width: 80%;"/>
                                         </div>
-                                    </div>
+                                        <div class="col-md-8 row">
+                                            <div class="card-body col-12">
+                                                <h5 class="card-title">${result.Title}</h5>
+                                                <p class="card-text">${result.Type}</p>
+                                                <p class="card-text">${result.Year}</p>
+                                            </div>
+                                            <div class="text-body-secondary align-self-end text-end">
+                                                <a href="/media/${result.ExternalID}" class="text-decoration-none bs-dark-text-emphasis">Más detalles</a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             `;
