@@ -37,7 +37,6 @@ async function getReview(req){
 }
 
 async function apiCreateReview(req, res){
-    console.log(req.body)
     return res.json(await createReview(req));
 }
 
